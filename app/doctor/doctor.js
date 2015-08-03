@@ -169,7 +169,7 @@ angular.module('myApp.doctor', ['NewfileDialog', 'angularModalService','ngFileUp
         $scope.add = function()
         {
             //
-            var doc = {name:'王二',sex:'男',age:'',selected:[],phone:'',image:'default.jpg'};
+            var doc = {name:'王二',sex:'男',age:'',password:'123',selected:[],phone:'',image:'default.jpg'};
             addDoctor(doc);
             //
         }
