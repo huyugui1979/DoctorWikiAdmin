@@ -160,7 +160,7 @@ angular.module('myApp.question', ['NewfileDialog', 'cgBusy', 'angularModalServic
                     });
                     sheetNames.forEach(function (element, i, r) {
                         result[element].forEach(function (e3, i3, r3) {
-                            e3.tag = value.category;
+                            e3.category = value.category;
                             e3.comments=[];
                             e3.doctor=null;
                         });
@@ -197,7 +197,6 @@ angular.module('myApp.question', ['NewfileDialog', 'cgBusy', 'angularModalServic
                     cellTemplate: '<a ng-if="row.entity.$$treeLevel != 0" class="btn" ng-click="$event.stopPropagation();grid.appScope.showMe(row.entity)">导入数据</a>'
                 }
             ]
-
 
         };
         $scope.gridOptions1.onRegisterApi = function (gridApi) {
@@ -244,7 +243,6 @@ angular.module('myApp.question', ['NewfileDialog', 'cgBusy', 'angularModalServic
 
             });
         }
-
         var getTatalPage = function () {
             $scope.myPromise = $http.get('http://huyugui.f3322.org:3000/questions/count', {params: {tag: $scope.selectTag}}).success(function (data) {
                 $scope.gridOptions2.totalItems = data;
@@ -259,7 +257,7 @@ angular.module('myApp.question', ['NewfileDialog', 'cgBusy', 'angularModalServic
                 params: {
                     pageNo: paginationOptions.pageNumber,
                     pageNumber: paginationOptions.pageSize,
-                    tag:$scope.selectTag
+                    category:$scope.selectTag
                 }
             })
                 .success(function (data) {

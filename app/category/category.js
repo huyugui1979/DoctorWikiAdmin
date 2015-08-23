@@ -10,5 +10,7 @@ angular.module('myApp.category', ['ngRoute', 'ui.grid', 'ui.grid.treeView', 'ui.
         });
     }])
     .controller('CategoryCtrl', function ($scope, $http) {
+        //
 
+        //
     })
