@@ -36,7 +36,7 @@ angular.module('myApp.doctor', ['NewfileDialog', 'angularModalService','ngFileUp
             close(result, 500);
         };
         var loadCategory = function () {
-            $http.get('http://127.0.0.1:3030/category').success(function (result) {
+            $http.get('http://113.31.89.204:3030/category').success(function (result) {
                 var data = [];
                 var count=0;
                 result.forEach(function (e, i, a) {
@@ -77,7 +77,7 @@ angular.module('myApp.doctor', ['NewfileDialog', 'angularModalService','ngFileUp
             totalPage: 1
         };
         var loadCategory = function () {
-            $scope.myPromise = $http.get('http://127.0.0.1:3030/category').success(function (result) {
+            $scope.myPromise = $http.get('http://113.31.89.204:3030/category').success(function (result) {
                 //
                 $scope.categorys = result;
                 //
@@ -93,7 +93,7 @@ angular.module('myApp.doctor', ['NewfileDialog', 'angularModalService','ngFileUp
         $scope.sexs = [{name: '男'}, {name: '女'}];
         var updateDoctor = function(entity){
             //
-            $scope.myPromise = $http.put('http://127.0.0.1:3030/doctors', entity).success(function (data) {
+            $scope.myPromise = $http.put('http://113.31.89.204:3030/doctors', entity).success(function (data) {
                 //
 
                 //
@@ -103,7 +103,7 @@ angular.module('myApp.doctor', ['NewfileDialog', 'angularModalService','ngFileUp
             //
         }
         var addDoctor=function(entity){
-            $scope.myPromise = $http.post('http://127.0.0.1:3030/doctors', entity).success(function (data) {
+            $scope.myPromise = $http.post('http://113.31.89.204:3030/doctors', entity).success(function (data) {
                 getTatalPage();
                 getPage();
             }).error(function (data) {
@@ -113,7 +113,7 @@ angular.module('myApp.doctor', ['NewfileDialog', 'angularModalService','ngFileUp
         $scope.delDoctor = function(entity){
             //
             //
-            $scope.myPromise = $http.delete('http://127.0.0.1:3030/doctors',{params:entity}).success(function (data) {
+            $scope.myPromise = $http.delete('http://113.31.89.204:3030/doctors',{params:entity}).success(function (data) {
                 //
                 getTatalPage();
                 getPage();
@@ -151,7 +151,7 @@ angular.module('myApp.doctor', ['NewfileDialog', 'angularModalService','ngFileUp
                 var files = e.target.files;
 
                 $scope.myPromise=Upload.upload({
-                    url: 'http://127.0.0.1:3030/portrait',
+                    url: 'http://113.31.89.204:3030/portrait',
                     fields: {'postImg': 'default'},
                     file: files[0]
                 }).progress(function (evt) {
@@ -195,7 +195,7 @@ angular.module('myApp.doctor', ['NewfileDialog', 'angularModalService','ngFileUp
                 {name: '手机', field: 'phone'},
                 {
                     name: '头像',
-                    cellTemplate: '<a  ng-if="row.entity.$$treeLevel != 0" class="btn" ng-click="$event.stopPropagation();grid.appScope.changePortait(row.entity)"><img width="30" height="30" ng-src="http://127.0.0.1:3030/images/{{row.entity.image}}" ></a>'
+                    cellTemplate: '<a  ng-if="row.entity.$$treeLevel != 0" class="btn" ng-click="$event.stopPropagation();grid.appScope.changePortait(row.entity)"><img width="30" height="30" ng-src="http://113.31.89.204:3030/images/{{row.entity.image}}" ></a>'
                 },
                 {
                     name: '兴趣',
@@ -224,7 +224,7 @@ angular.module('myApp.doctor', ['NewfileDialog', 'angularModalService','ngFileUp
             }
         }
         var getTatalPage = function () {
-            $scope.myPromise = $http.get('http://127.0.0.1:3030/doctors/count').success(function (data) {
+            $scope.myPromise = $http.get('http://113.31.89.204:3030/doctors/count').success(function (data) {
                 $scope.gridOptions.totalItems = data;
             }).error(function (data) {
 
@@ -233,7 +233,7 @@ angular.module('myApp.doctor', ['NewfileDialog', 'angularModalService','ngFileUp
         //加载
         var getPage = function () {
             //var url = "http://"
-            $scope.myPromise = $http.get('http://127.0.0.1:3030/doctors', {
+            $scope.myPromise = $http.get('http://113.31.89.204:3030/doctors', {
                 params: {
                     pageNo: paginationOptions.pageNumber,
                     pageNumber: paginationOptions.pageSize,
