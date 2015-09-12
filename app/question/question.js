@@ -27,7 +27,7 @@ angular.module('myApp.question', ['NewfileDialog', 'cgBusy', 'angularModalServic
         };
         $scope.delete=function(entity){
             //
-            $scope.myPromise = $http.delete('http://113.31.89.204 :3030/comments',{params:entity}).success(function (data) {
+            $scope.myPromise = $http.delete('http://127.0.0.1:3030/comments',{params:entity}).success(function (data) {
                 //
                 loadComment();
                 //
@@ -41,7 +41,7 @@ angular.module('myApp.question', ['NewfileDialog', 'cgBusy', 'angularModalServic
             close(result, 500);
         };
         var loadComment = function () {
-            $http.get('http://113.31.89.204 :3030/comments/question',{params:{question:entity._id}}).success(function (result) {
+            $http.get('http://127.0.0.1:3030/comments/question',{params:{question:entity._id}}).success(function (result) {
                 //
                 $scope.gridOptions1.data = result;
                 //
@@ -83,7 +83,7 @@ angular.module('myApp.question', ['NewfileDialog', 'cgBusy', 'angularModalServic
             });
         }
         $scope.delete = function(entity){
-            $scope.myPromise = $http.delete('http://113.31.89.204 :3030/questions',{params:entity}).success(function (data) {
+            $scope.myPromise = $http.delete('http://127.0.0.1:3030/questions',{params:entity}).success(function (data) {
                 //
                 getTatalPage();
                 getPage();
@@ -207,7 +207,7 @@ angular.module('myApp.question', ['NewfileDialog', 'cgBusy', 'angularModalServic
                             e3.comments=[];
                             e3.doctor=null;
                         });
-                        $scope.myPromise = $http.post("http://113.31.89.204 :3030/questions", result[element]).success(function (data) {
+                        $scope.myPromise = $http.post("http://127.0.0.1:3030/questions", result[element]).success(function (data) {
                             //
                             getTatalPage();
                             getPage();
@@ -260,7 +260,7 @@ angular.module('myApp.question', ['NewfileDialog', 'cgBusy', 'angularModalServic
 
 
         var loadCategory = function () {
-            $scope.myPromise = $http.get('http://113.31.89.204 :3030/category').success(function (result) {
+            $scope.myPromise = $http.get('http://127.0.0.1:3030/category').success(function (result) {
                 var data = [];
                 result.forEach(function (e, i, a) {
                     //
@@ -286,7 +286,7 @@ angular.module('myApp.question', ['NewfileDialog', 'cgBusy', 'angularModalServic
             });
         }
         var getTatalPage = function () {
-            $scope.myPromise = $http.get('http://113.31.89.204 :3030/questions/count', {params: {tag: $scope.selectTag}}).success(function (data) {
+            $scope.myPromise = $http.get('http://127.0.0.1:3030/questions/count', {params: {tag: $scope.selectTag}}).success(function (data) {
                 $scope.gridOptions2.totalItems = data;
             }).error(function (data) {
 
@@ -295,7 +295,7 @@ angular.module('myApp.question', ['NewfileDialog', 'cgBusy', 'angularModalServic
         //加载
         var getPage = function () {
             //var url = "http://"
-            $scope.myPromise = $http.get('http://113.31.89.204 :3030/questions', {
+            $scope.myPromise = $http.get('http://127.0.0.1:3030/questions', {
                 params: {
                     pageNo: paginationOptions.pageNumber,
                     pageNumber: paginationOptions.pageSize,
