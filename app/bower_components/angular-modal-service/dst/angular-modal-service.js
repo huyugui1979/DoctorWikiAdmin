@@ -28,6 +28,7 @@
         if(template) {
           deferred.resolve(template);
         } else if(templateUrl) {
+
           // check to see if the template has already been loaded
           var cachedTemplate = $templateCache.get(templateUrl);
           if(cachedTemplate !== undefined) {

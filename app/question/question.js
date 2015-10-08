@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('myApp.question', ['NewfileDialog', 'cgBusy', 'angularModalService','ngRoute', 'ui.grid', 'ui.grid.treeView','ui.grid.edit', 'ui.grid.cellNav', 'ui.grid.selection', 'ui.grid.pagination'])
+angular.module('myApp.question', ['myApp','NewfileDialog', 'cgBusy', 'angularModalService', 'ngRoute', 'ui.grid', 'ui.grid.treeView', 'ui.grid.edit', 'ui.grid.cellNav', 'ui.grid.selection', 'ui.grid.pagination'])
 
     .config(['$routeProvider', function ($routeProvider, $http) {
         $routeProvider.when('/question', {
@@ -9,7 +9,30 @@ angular.module('myApp.question', ['NewfileDialog', 'cgBusy', 'angularModalServic
         });
     }])
     //
-    .controller('CommentModalCtrl', function ($scope, close,$http, entity) {
+    .controller('EditModalCtrl',function ($scope, close, $http, object,SERVER){
+
+        var ck;
+        $scope.$watch('$viewContentLoaded', function(event) {
+             ck=CKEDITOR.replace( 'editor1' ,
+            {
+                toolbar : 'basic',
+                    uiColor : '# 9AB8F3',
+                enterMode : CKEDITOR.ENTER_BR
+            });
+        });
+        $scope.htmlVariable = object;
+        $scope.closeModal = function (result) {
+            if(result == 'Yes') {
+                var data = ck.getData();
+                close(data, 500);
+            }
+            else
+                close(null,500);
+        };
+        //
+    })
+
+    .controller('CommentModalCtrl', function ($scope, close, $http, entity,SERVER) {
         $scope.gridOptions1 = {
             enableRowSelection: true,
             enableRowHeaderSelection: false,
@@ -25,9 +48,9 @@ angular.module('myApp.question', ['NewfileDialog', 'cgBusy', 'angularModalServic
             ]
 
         };
-        $scope.delete=function(entity){
+        $scope.delete = function (entity) {
             //
-            $scope.myPromise = $http.delete('http://113.31.89.204:3030/comments',{params:entity}).success(function (data) {
+            $scope.myPromise = $http.delete(SERVER.URL+'/comments', {params: entity}).success(function (data) {
                 //
                 loadComment();
                 //
@@ -37,11 +60,11 @@ angular.module('myApp.question', ['NewfileDialog', 'cgBusy', 'angularModalServic
             //
         }
 
-        $scope.closeModal = function(result) {
+        $scope.closeModal = function (result) {
             close(result, 500);
         };
         var loadComment = function () {
-            $http.get('http://113.31.89.204:3030/comments/question',{params:{question:entity._id}}).success(function (result) {
+            $http.get(SERVER.URL+'/comments/question', {params: {question: entity._id}}).success(function (result) {
                 //
                 $scope.gridOptions1.data = result;
                 //
@@ -54,7 +77,7 @@ angular.module('myApp.question', ['NewfileDialog', 'cgBusy', 'angularModalServic
         loadComment();
     })
     //
-    .controller('QuestionCtrl', function ($scope,ModalService, $http, fileDialog) {
+    .controller('QuestionCtrl', function ($scope, ModalService,SERVER,$templateCache, $http,$q, fileDialog) {
         //选中的类别
         $scope.selectTag = '';
         var paginationOptions = {
@@ -63,27 +86,74 @@ angular.module('myApp.question', ['NewfileDialog', 'cgBusy', 'angularModalServic
             totalPage: 1
         };
         //
-        $scope.editComment = function(entity){
+        $scope.editQuestion = function(entity){
+            ModalService.showModal({
+                templateUrl: "question/editModal.html",
+                controller: "EditModalCtrl",
+                inputs: {object:entity.question}
+            }).then(function (modal) {
+
+               modal.element.modal();
+                modal.close.then(function (result) {
+                    //
+
+                    if(result != null) {
+
+                        var obj = {_id:entity._id,question:result};
+
+                        update(obj).then(function () {
+                            entity.question=result;
+                        });
+                    }
+                    //
+                });
+            });
+        }
+        $scope.editAnswer = function(entity){
+            ModalService.showModal({
+                templateUrl: "question/editModal.html",
+                controller: "EditModalCtrl",
+                inputs: {object:entity.answer}
+            }).then(function (modal) {
+
+                modal.element.modal();
+                modal.close.then(function (result) {
+                    if(result != null) {
+
+                        var obj = {_id:entity._id,answer:result};
+
+                        update(obj).then(function () {
+                            entity.answer=result;
+                        });
+                    }
+                });
+            });
+        }
+        $scope.editComment = function (entity) {
+
             ModalService.showModal({
                 templateUrl: "question/commentModal.html",
                 controller: "CommentModalCtrl",
-                inputs:{entity:entity}
+                inputs: {entity: entity}
             }).then(function (modal) {
                 // The modal object has the element built, if this is a bootstrap modal
                 // you can call 'modal' to show it, if it's a custom modal just show or hide
                 // it as you need to.
+
                 modal.element.modal();
                 modal.close.then(function (result) {
-                    if(result == "Yes"){
+                    if (result == "Yes") {
                         //
-                        update(object);
+                        //update(object).success(function(){
+
+
                         //
                     }
                 });
             });
         }
-        $scope.delete = function(entity){
-            $scope.myPromise = $http.delete('http://113.31.89.204:3030/questions',{params:entity}).success(function (data) {
+        $scope.delete = function (entity) {
+            $scope.myPromise = $http.delete(SERVER.URL+'/questions', {params: entity}).success(function (data) {
                 //
                 getTatalPage();
                 getPage();
@@ -92,9 +162,21 @@ angular.module('myApp.question', ['NewfileDialog', 'cgBusy', 'angularModalServic
 
             });
         }
-        $scope.update = function(entity){
+        var update = function (entity) {
             //
+            var deferred = $q.defer();
+            $http.put(SERVER.URL+"/questions", entity).success(function (data) {
+                //
+                deferred.resolve();
+                //
+            }).error(function (data) {
+                //
+                deferred.reject();
+                //
+            }).finally(function () {
 
+            });
+            return   deferred.promise;
             //
         }
 
@@ -102,13 +184,15 @@ angular.module('myApp.question', ['NewfileDialog', 'cgBusy', 'angularModalServic
         $scope.gridOptions2 = {
             paginationPageSizes: [25, 50, 75],
             paginationPageSize: 25,
-            enableCellEditOnFocus: true,
+
             useExternalPagination: true,
             columnDefs: [
-                {name: '问题内容', field: 'question'},
-                {name: '问题类别', field: 'tag'},
-                {name: '问题答案', field: 'answer'},
+                {name: '问题内容',     cellTemplate: '<a ng-if="row.entity.$$treeLevel != 0" class="btn" ng-click="$event.stopPropagation();grid.appScope.editQuestion(row.entity,row)">{{row.entity.question}}</a>'
+                    },
+                {name: '问题答案', cellTemplate: '<a ng-if="row.entity.$$treeLevel != 0" class="btn" ng-click="$event.stopPropagation();grid.appScope.editAnswer(row.entity,row)">{{row.entity.answer}}</a>'
+                },
                 {name: '医生', field: 'doctor.name'},
+
                 {
                     name: '评论',
                     cellTemplate: '<a  ng-click="$event.stopPropagation();grid.appScope.editComment(row.entity)">编辑</a>'
@@ -117,9 +201,30 @@ angular.module('myApp.question', ['NewfileDialog', 'cgBusy', 'angularModalServic
                     name: '删除',
                     cellTemplate: '<a ng-if="row.entity.$$treeLevel != 0" class="btn" ng-click="$event.stopPropagation();grid.appScope.delete(row.entity)">删除</a>'
                 }
-            ],
-            onRegisterApi: function (gridApi) {
 
+            ],
+
+            onRegisterApi: function (gridApi) {
+                gridApi.edit.on.beginCellEdit($scope, function(rowEntity, colDef) {
+                    var j=2;
+                    //
+                    ModalService.showModal({
+                        templateUrl: "question/editModal.html",
+                        controller: "EditModalCtrl",
+                        inputs: {entity: rowEntity}
+                    }).then(function (modal) {
+
+                        modal.element.modal();
+                        modal.close.then(function (result) {
+                            if (result == "Yes") {
+                                //
+                                //update(object);
+                                //
+                            }
+                        });
+                    });
+                    //
+                });
                 gridApi.edit.on.afterCellEdit($scope, function (rowEntity, colDef, newValue, oldValue) {
                     rowEntity[colDef.field] = newValue;
                     $scope.update(rowEntity);
@@ -138,6 +243,7 @@ angular.module('myApp.question', ['NewfileDialog', 'cgBusy', 'angularModalServic
                 });
             }
         }
+
         //导入数据
         $scope.showMe = function (value) {
             //
@@ -160,54 +266,11 @@ angular.module('myApp.question', ['NewfileDialog', 'cgBusy', 'angularModalServic
                     });
                     sheetNames.forEach(function (element, i, r) {
                         result[element].forEach(function (e3, i3, r3) {
-                            if(e3.category == "内科")
-                            {
-                                e3.category="普通内科";
-                            }
-                            if(e3.category == "外科")
-                            {
-                                e3.category="普通外科";
-                            }
-                            if(e3.category == "儿科")
-                            {
-                                e3.category="儿科综合";
-                            }
-                            if(e3.category == "传染病科")
-                            {
-                                e3.category="传染科";
-                            }
-                            if(e3.category == "妇产科")
-                            {
-                                e3.category="妇产科综合";
-                            }
-                            if(e3.category == "口腔科")
-                            {
-                                e3.category="口腔综合科";
-                            }
-                            if(e3.category == "中医科")
-                            {
-                                e3.category="中医综合科";
-                            }
-                            if(e3.category == "肿瘤科")
-                            {
-                                e3.category="肿瘤综合科";
-                            }
-                            if(e3.category == "眼科")
-                            {
-                                e3.category="眼科综合";
-                            }
-                            if(e3.category == "其他科室")
-                            {
-                                e3.category="其他";
-                            }
-                            if(e3.category == "医学影像学")
-                            {
-                                e3.category="医学影像科";
-                            }
-                            e3.comments=[];
-                            e3.doctor=null;
+                            e3.comments = [];
+                            e3.doctor = null;
+                            e3.random = [Math.random(), Math.random()];
                         });
-                        $scope.myPromise = $http.post("http://113.31.89.204:3030/questions", result[element]).success(function (data) {
+                        $scope.myPromise = $http.post(SERVER.URL+"/questions", result[element]).success(function (data) {
                             //
                             getTatalPage();
                             getPage();
@@ -237,6 +300,14 @@ angular.module('myApp.question', ['NewfileDialog', 'cgBusy', 'angularModalServic
                 {
                     name: '导入数据',
                     cellTemplate: '<a ng-if="row.entity.$$treeLevel != 0" class="btn" ng-click="$event.stopPropagation();grid.appScope.showMe(row.entity)">导入数据</a>'
+                },
+                {
+                    name: '己认领',
+                    field: 'acceptCount'
+                },
+                {
+                    name: '未认领',
+                    field: 'unacceptCount'
                 }
             ]
 
@@ -260,14 +331,14 @@ angular.module('myApp.question', ['NewfileDialog', 'cgBusy', 'angularModalServic
 
 
         var loadCategory = function () {
-            $scope.myPromise = $http.get('http://113.31.89.204:3030/category').success(function (result) {
+            $scope.myPromise = $http.get(SERVER.URL+'/category/admin').success(function (result) {
                 var data = [];
                 result.forEach(function (e, i, a) {
                     //
                     data.push({category: e.name, $$treeLevel: 0});
-                    e.child_depart.forEach(function (e1, i1, a1) {
+                    e.count.forEach(function (e1, i1, a1) {
                         //
-                        data.push({category: e1});
+                        data.push({category: e1.category,acceptCount:e1.acceptCount,unacceptCount:e1.unacceptCount});
                         //
                     });
                     //
@@ -286,7 +357,7 @@ angular.module('myApp.question', ['NewfileDialog', 'cgBusy', 'angularModalServic
             });
         }
         var getTatalPage = function () {
-            $scope.myPromise = $http.get('http://113.31.89.204:3030/questions/count', {params: {tag: $scope.selectTag}}).success(function (data) {
+            $scope.myPromise = $http.get(SERVER.URL+'/questions/count', {params: {tag: $scope.selectTag}}).success(function (data) {
                 $scope.gridOptions2.totalItems = data;
             }).error(function (data) {
 
@@ -295,15 +366,19 @@ angular.module('myApp.question', ['NewfileDialog', 'cgBusy', 'angularModalServic
         //加载
         var getPage = function () {
             //var url = "http://"
-            $scope.myPromise = $http.get('http://113.31.89.204:3030/questions', {
+            $scope.myPromise = $http.get(SERVER.URL+'/questions', {
                 params: {
                     pageNo: paginationOptions.pageNumber,
                     pageNumber: paginationOptions.pageSize,
-                    category:$scope.selectTag
+                    category: $scope.selectTag
                 }
             })
                 .success(function (data) {
-
+                    data.forEach(function(e,i,a){
+                       if(e.doctor == null){
+                           e.doctor={name:'未认领'};
+                       }
+                    });
                     $scope.gridOptions2.data = data;
                 }).error(function (data) {
 

@@ -5,7 +5,10 @@
     "angular": "~1.2.12-build.2226",
     "angular-route": "~1.2.12-build.2226",
     "bootstrap": "~3.1.0",
-    "angular-bootstrap": "~0.10.0"
+    "angular-bootstrap": "~0.10.0",
+    "angular-chart.js": "~0.8.4",
+    "angular-datepicker": "~1.0.17",
+    "ng.ckeditor": "*"
   },
   "devDependencies": {}
 }

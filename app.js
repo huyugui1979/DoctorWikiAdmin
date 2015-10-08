@@ -21,7 +21,7 @@ if (app.get('env') === 'development') {
 
 // angular启动页
 app.get('/', function (req, res) {
-    res.sendfile('app/index.html');
+    res.sendfile('app/login.html');
 });
 
 server.listen(app.get('port'), function () {
