@@ -40,7 +40,7 @@ angular.module('myApp.question', ['myApp','NewfileDialog', 'cgBusy', 'angularMod
             columnDefs: [
                 {name: '内容', field: 'content'},
                 {name: '时间', field: 'commentTime'},
-                {name: '医生', field: 'doctor.name'},
+                {name: '医生', field: 'doctor.trueName'},
                 {
                     name: '删除',
                     cellTemplate: '<a ng-if="row.entity.$$treeLevel != 0" class="btn" ng-click="$event.stopPropagation();grid.appScope.delete(row.entity)">删除</a>'
@@ -184,27 +184,31 @@ angular.module('myApp.question', ['myApp','NewfileDialog', 'cgBusy', 'angularMod
         $scope.gridOptions2 = {
             paginationPageSizes: [25, 50, 75],
             paginationPageSize: 25,
-
+            enableFiltering: true,
+            useExternalFiltering: true,
             useExternalPagination: true,
             columnDefs: [
                 {name: '问题内容',     cellTemplate: '<a ng-if="row.entity.$$treeLevel != 0" class="btn" ng-click="$event.stopPropagation();grid.appScope.editQuestion(row.entity,row)">{{row.entity.question}}</a>'
                     },
-                {name: '问题答案', cellTemplate: '<a ng-if="row.entity.$$treeLevel != 0" class="btn" ng-click="$event.stopPropagation();grid.appScope.editAnswer(row.entity,row)">{{row.entity.answer}}</a>'
+                {name: '问题答案',enableFiltering: false, cellTemplate: '<a ng-if="row.entity.$$treeLevel != 0" class="btn" ng-click="$event.stopPropagation();grid.appScope.editAnswer(row.entity,row)">{{row.entity.answer}}</a>'
                 },
-                {name: '医生', field: 'doctor.name'},
 
+                {name: '医生', field: 'doctor.trueName'},
                 {
-                    name: '评论',
-                    cellTemplate: '<a  ng-click="$event.stopPropagation();grid.appScope.editComment(row.entity)">编辑</a>'
+                    name: '评论',enableFiltering: false,
+                    cellTemplate: '<a  ng-click="$event.stopPropagation();grid.appScope.editComment(row.entity)">{{row.entity.comments.length}}</a>'
                 },
                 {
-                    name: '删除',
+                    name: '删除',enableFiltering: false,
                     cellTemplate: '<a ng-if="row.entity.$$treeLevel != 0" class="btn" ng-click="$event.stopPropagation();grid.appScope.delete(row.entity)">删除</a>'
                 }
 
             ],
 
             onRegisterApi: function (gridApi) {
+                $scope.gridApi.core.on.filterChanged( $scope, function() {
+
+                });
                 gridApi.edit.on.beginCellEdit($scope, function(rowEntity, colDef) {
                     var j=2;
                     //
@@ -289,6 +293,44 @@ angular.module('myApp.question', ['myApp','NewfileDialog', 'cgBusy', 'angularMod
                 //
             });
         }
+        $scope.selectCategory = function(object){
+            //
+            if( object.$$treeLevel  !=null)
+            {
+                //
+                if(object.selected == true ) {
+                    var index = $scope.gridOptions1.data.indexOf(object);
+                    index = index + 1;
+                    while ($scope.gridOptions1.data[index].$$treeLevel == null) {
+                        $scope.gridOptions1.data[index].selected = true;
+                        $scope.categorys.push($scope.gridOptions1.data[index].category);
+                        index = index + 1;
+                    }
+                }else{
+
+                    var index = $scope.gridOptions1.data.indexOf(object);
+                    index = index + 1;
+                    while ($scope.gridOptions1.data[index].$$treeLevel == null) {
+                        $scope.gridOptions1.data[index].selected = false;
+                        var j = $scope.categorys.indexOf( $scope.gridOptions1.data[index].category);
+                        $scope.categorys.splice(j,1);
+                        index = index + 1;
+                    }
+                }
+            }//
+            else {
+                var index = $scope.gridOptions1.data.indexOf(object);
+                if (object.selected == true) {
+                    $scope.categorys.push(object.category);
+                }else{
+                    var j = $scope.categorys.indexOf( $scope.gridOptions1.data[index].category);
+                    $scope.categorys.splice(j,1);
+                }
+            }
+            getTatalPage();
+            getPage();
+            //
+        }
         //加载表格1
         $scope.gridOptions1 = {
             enableRowSelection: true,
@@ -296,6 +338,7 @@ angular.module('myApp.question', ['myApp','NewfileDialog', 'cgBusy', 'angularMod
             enableRowHeaderSelection: false,
             multiSelect: false,
             columnDefs: [
+                {name:'选取',cellTemplate: '<input type="checkbox" ng-model="row.entity.selected" ng-click="grid.appScope.selectCategory(row.entity)">'},
                 {name: '类别', field: 'category'},
                 {
                     name: '导入数据',
@@ -310,35 +353,24 @@ angular.module('myApp.question', ['myApp','NewfileDialog', 'cgBusy', 'angularMod
                     field: 'unacceptCount'
                 }
             ]
-
         };
         $scope.gridOptions1.onRegisterApi = function (gridApi) {
             $scope.gridApi = gridApi;
-            gridApi.selection.on.rowSelectionChanged($scope, function (row) {
-                //
-                if (row.entity.$$treeLevel != 0) {
-                    //
-                    $scope.selectTag = row.entity.category;
-                    //
-                    getTatalPage();
-                    getPage();
-                    //
-                }
-                //
-            });
+
 
         }
 
+        $scope.categorys =[];
 
         var loadCategory = function () {
             $scope.myPromise = $http.get(SERVER.URL+'/category/admin').success(function (result) {
                 var data = [];
                 result.forEach(function (e, i, a) {
                     //
-                    data.push({category: e.name, $$treeLevel: 0});
+                    data.push({selected:false,category: e.name, $$treeLevel: 0});
                     e.count.forEach(function (e1, i1, a1) {
                         //
-                        data.push({category: e1.category,acceptCount:e1.acceptCount,unacceptCount:e1.unacceptCount});
+                        data.push({selected:false,category: e1.category,acceptCount:e1.acceptCount,unacceptCount:e1.unacceptCount});
                         //
                     });
                     //
@@ -357,7 +389,7 @@ angular.module('myApp.question', ['myApp','NewfileDialog', 'cgBusy', 'angularMod
             });
         }
         var getTatalPage = function () {
-            $scope.myPromise = $http.get(SERVER.URL+'/questions/count', {params: {tag: $scope.selectTag}}).success(function (data) {
+            $scope.myPromise = $http.get(SERVER.URL+'/questions/count', {params: {"categorys[]": $scope.categorys}}).success(function (data) {
                 $scope.gridOptions2.totalItems = data;
             }).error(function (data) {
 
@@ -370,7 +402,8 @@ angular.module('myApp.question', ['myApp','NewfileDialog', 'cgBusy', 'angularMod
                 params: {
                     pageNo: paginationOptions.pageNumber,
                     pageNumber: paginationOptions.pageSize,
-                    category: $scope.selectTag
+                    "categorys[]": $scope.categorys
+
                 }
             })
                 .success(function (data) {

@@ -3,14 +3,13 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" ng-click="closeModal('Cancel')" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h4 class="modal-title">选择兴趣</h4>
+                <h4 class="modal-title">查询总数</h4>
             </div>
             <div class="modal-body">
                 <div>起始时间:<input type="datetime" min-view="date" max-view="date" date-time  ng-model="parent.beginTime"></div>
                 <div>结束时间:<input type="datetime" min-view="date" max-view="date" date-time ng-model="parent.endTime"></div>
                 <div><button class="btn btn-default" ng-click="clickSearch()"> 搜索</button></div>
-                <div id="grid2" ui-grid="gridOptions2"  ui-grid-tree-view   ui-grid-selection ui-grid-resize-columns class="grid"></div>
-
+                <div><input type="text" ng-model="parent.count"> </div>
             </div>
             <div class="modal-footer">
                 <button type="button" ng-click="closeModal('No')" class="btn btn-default" data-dismiss="modal">No</button>

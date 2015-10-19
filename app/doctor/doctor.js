@@ -24,7 +24,7 @@ angular.module('myApp.doctor', ['NewfileDialog', 'datePicker', 'angularModalServ
         //
         $scope.beginTime=null;
         $scope.endTime=null;
-        $scope.parent = {beginTime:'',endTime:''};
+        $scope.parent = {beginTime:'',endTime:'',count:0};
 
         var loadData=function( beginTime,endTime){
             $http.get(SERVER.URL+'/doctor/comment', {
@@ -35,15 +35,8 @@ angular.module('myApp.doctor', ['NewfileDialog', 'datePicker', 'angularModalServ
                     }
                 }
             ).success(function (result) {
-                    if(result.length>0) {
-                        $scope.gridOptions2.data = result;
-
-                        $scope.parent.beginTime = result[0].answerTime;
-                        $scope.parent.endTime = result[result.length - 1].answerTime;
-                    }
-                    //
+                    $scope.parent.count = result;
                 });
-
         }
         loadData();
         $scope.clickSearch = function () {
@@ -61,6 +54,7 @@ angular.module('myApp.doctor', ['NewfileDialog', 'datePicker', 'angularModalServ
     .controller('CheckAcceptModalCtrl', function ($scope, close, $http,SERVER, entity) {
         $scope.gridOptions2 = {
             enableRowSelection: true,
+            showGridFooter: true,
             enableRowHeaderSelection: false,
             multiSelect: false,
             columnDefs: [
@@ -73,7 +67,7 @@ angular.module('myApp.doctor', ['NewfileDialog', 'datePicker', 'angularModalServ
         //
         $scope.beginTime=null;
         $scope.endTime=null;
-        $scope.parent = {beginTime:'',endTime:''};
+        $scope.parent = {beginTime:'',endTime:'',count:0};
 
         var loadData=function( beginTime,endTime){
             $http.get(SERVER.URL+'/doctor/count', {
@@ -84,12 +78,11 @@ angular.module('myApp.doctor', ['NewfileDialog', 'datePicker', 'angularModalServ
                     }
                 }
             ).success(function (result) {
-                    if(result.length>0) {
-                        $scope.gridOptions2.data = result;
 
-                        $scope.parent.beginTime = result[0].answerTime;
-                        $scope.parent.endTime = result[result.length - 1].answerTime;
-                    }
+                        //$scope.gridOptions2.data = result;
+                        $scope.parent.count = result;
+
+
                     //
                 });
 
@@ -337,7 +330,6 @@ angular.module('myApp.doctor', ['NewfileDialog', 'datePicker', 'angularModalServ
                         footerCellTemplate: '<div class="ui-grid-cell-contents" ng-click="" ><a ng-click=" $event.stopPropagation();grid.appScope.add()">增加</a></div>'
                     },
                     {name: '密码', field: 'password'},
-                    {name: '年纪', field: 'age'},
                     {name: '手机', field: 'phone'},
                     {
                         name: '头像',
