@@ -184,22 +184,21 @@ angular.module('myApp.question', ['myApp','NewfileDialog', 'cgBusy', 'angularMod
         $scope.gridOptions2 = {
             paginationPageSizes: [25, 50, 75],
             paginationPageSize: 25,
-            enableFiltering: true,
-            useExternalFiltering: true,
+
             useExternalPagination: true,
             columnDefs: [
                 {name: '问题内容',     cellTemplate: '<a ng-if="row.entity.$$treeLevel != 0" class="btn" ng-click="$event.stopPropagation();grid.appScope.editQuestion(row.entity,row)">{{row.entity.question}}</a>'
                     },
-                {name: '问题答案',enableFiltering: false, cellTemplate: '<a ng-if="row.entity.$$treeLevel != 0" class="btn" ng-click="$event.stopPropagation();grid.appScope.editAnswer(row.entity,row)">{{row.entity.answer}}</a>'
+                {name: '问题答案', cellTemplate: '<a ng-if="row.entity.$$treeLevel != 0" class="btn" ng-click="$event.stopPropagation();grid.appScope.editAnswer(row.entity,row)">{{row.entity.answer}}</a>'
                 },
 
                 {name: '医生', field: 'doctor.trueName'},
                 {
-                    name: '评论',enableFiltering: false,
+                    name: '评论',
                     cellTemplate: '<a  ng-click="$event.stopPropagation();grid.appScope.editComment(row.entity)">{{row.entity.comments.length}}</a>'
                 },
                 {
-                    name: '删除',enableFiltering: false,
+                    name: '删除',
                     cellTemplate: '<a ng-if="row.entity.$$treeLevel != 0" class="btn" ng-click="$event.stopPropagation();grid.appScope.delete(row.entity)">删除</a>'
                 }
 
