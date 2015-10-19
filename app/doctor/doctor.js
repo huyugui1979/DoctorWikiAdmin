@@ -35,7 +35,7 @@ angular.module('myApp.doctor', ['NewfileDialog', 'datePicker', 'angularModalServ
                     }
                 }
             ).success(function (result) {
-                    $scope.parent.count = result;
+                    $scope.parent.count = result.length;
                 });
         }
         loadData();
