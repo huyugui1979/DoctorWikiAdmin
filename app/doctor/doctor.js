@@ -13,10 +13,13 @@ angular.module('myApp.doctor', ['NewfileDialog', 'datePicker', 'angularModalServ
     .controller('CheckCommentModalCtrl',function($scope,close,SERVER,$http,entity){
         $scope.gridOptions2 = {
             enableRowSelection: true,
+            enableColumnResize: true,
             enableRowHeaderSelection: false,
             multiSelect: false,
             columnDefs: [
-                {name: '评论内容', field: 'content'},
+                {name: '问题', field: 'question.question',cellTemplate:'<div class="ui-grid-cell-contents" title="{{row.entity.question.question}}">{{row.entity.question.question}}</div>'},
+                {name: '答案', field: 'question.answer',cellTemplate:'<div class="ui-grid-cell-contents" title="{{row.entity.question.answer}}">{{row.entity.question.answer}}</div>'},
+                {name: '评论内容', field: 'content' },
                 {name: '评论时间', field: 'commentTime'},
 
             ]
@@ -35,6 +38,7 @@ angular.module('myApp.doctor', ['NewfileDialog', 'datePicker', 'angularModalServ
                     }
                 }
             ).success(function (result) {
+                    $scope.gridOptions2.data = result;
                     $scope.parent.count = result.length;
                 });
         }
@@ -55,6 +59,7 @@ angular.module('myApp.doctor', ['NewfileDialog', 'datePicker', 'angularModalServ
         $scope.gridOptions2 = {
             enableRowSelection: true,
             showGridFooter: true,
+            enableColumnResize: true,
             enableRowHeaderSelection: false,
             multiSelect: false,
             columnDefs: [
@@ -79,8 +84,8 @@ angular.module('myApp.doctor', ['NewfileDialog', 'datePicker', 'angularModalServ
                 }
             ).success(function (result) {
 
-                        //$scope.gridOptions2.data = result;
-                        $scope.parent.count = result;
+                        $scope.gridOptions2.data = result;
+                        $scope.parent.count = result.length;
 
 
                     //

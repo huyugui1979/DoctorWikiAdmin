@@ -10,6 +10,8 @@
                 <div>结束时间:<input type="datetime" min-view="date" max-view="date" date-time ng-model="parent.endTime"></div>
                 <div><button class="btn btn-default" ng-click="clickSearch()"> 搜索</button></div>
                 <div><input type="text" ng-model="parent.count"> </div>
+                <div id="grid1" ui-grid="gridOptions2"  ui-grid-tree-view   ui-grid-selection ui-grid-resize-columns class="grid"></div>
+
             </div>
             <div class="modal-footer">
                 <button type="button" ng-click="closeModal('No')" class="btn btn-default" data-dismiss="modal">No</button>
