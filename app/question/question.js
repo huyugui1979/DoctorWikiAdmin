@@ -29,31 +29,35 @@ angular.module('myApp.question', ['myApp', 'NewfileDialog', 'cgBusy', 'angularMo
 
     .controller('EditModalCtrl', function ($scope, close, $http, object, SERVER) {
 
-        var ck;
-        //$scope.$watch('$viewContentLoaded', function(event) {
-        //     ck=CKEDITOR.replace( 'editor1' ,
-        //    {
-        //        toolbar : 'basic',
-        //            uiColor : '# 9AB8F3',
-        //        enterMode : CKEDITOR.ENTER_BR
-        //    });
-        //
-        //});
-        //$scope.htmlVariable="";
-        $http.get(SERVER.URL + '/questions/detail', {params: {_id: object._id}}).success(function (data) {
-            //
-            ck = CKEDITOR.replace('editor1',
-                {
-                    toolbar: 'basic',
-                    uiColor: '# 9AB8F3',
-                    enterMode: CKEDITOR.ENTER_BR
-                });
-            ck.setData(data);
+        var ck=null;
+        $scope.$watch('$viewContentLoaded', function(event) {
+             ck=CKEDITOR.replace( 'editor1' ,
+            {
+                toolbar : 'basic',
+                    uiColor : '# 9AB8F3',
+                enterMode : CKEDITOR.ENTER_BR
+            });
 
-        }).error(function () {
-            //
-            //
-        })
+            if(object.type=="question") {
+                $http.get(SERVER.URL + '/questions/detail', {params: {_id: object.question._id}}).success(function (data) {
+
+                    ck.setData(data);
+
+                }).error(function () {
+                    //
+                    //
+                })
+            }else
+            {
+                //
+                ck.setData(object.question.answer);
+            }
+
+        });
+        //$scope.htmlVariable="";
+
+
+
         //
         $scope.closeModal = function (result) {
             if (result == 'Yes') {
@@ -124,7 +128,7 @@ angular.module('myApp.question', ['myApp', 'NewfileDialog', 'cgBusy', 'angularMo
             ModalService.showModal({
                 templateUrl: "question/editModal.html",
                 controller: "EditModalCtrl",
-                inputs: {object: entity}
+                inputs:  {object: {question:entity,type:"question"}}
             }).then(function (modal) {
 
                 modal.element.modal();
@@ -138,7 +142,7 @@ angular.module('myApp.question', ['myApp', 'NewfileDialog', 'cgBusy', 'angularMo
             ModalService.showModal({
                 templateUrl: "question/editModal.html",
                 controller: "EditModalCtrl",
-                inputs: {object: entity}
+                inputs: {object: {question:entity,type:"answer"}}
             }).then(function (modal) {
 
                 modal.element.modal();

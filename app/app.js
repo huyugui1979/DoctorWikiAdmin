@@ -12,7 +12,7 @@ angular.module('myApp', [
         $routeProvider.otherwise({redirectTo: '/view2'});
     }]). constant('SERVER', {
         // Local server
-        URL: 'http://113.31.89.204:3030'
+        URL: 'http://127.0.0.1:3030'
         // Public Heroku server
         //url: 'https://ionic-songhop.herokuapp.com'
     })
