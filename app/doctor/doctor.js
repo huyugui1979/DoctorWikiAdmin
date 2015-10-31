@@ -2,7 +2,7 @@
  * Created by yuguihu on 15/7/23.
  */
 'use strict';
-angular.module('myApp.doctor', ['NewfileDialog', 'datePicker', 'angularModalService', 'ngFileUpload', 'cgBusy', 'ngRoute', 'ui.grid', 'ui.grid.edit', 'ui.grid.cellNav', 'ui.grid.treeView', 'ui.grid.selection', 'ui.grid.pagination'])
+angular.module('myApp.doctor', ['NewfileDialog', 'datePicker', 'angularModalService', 'ui.date','ngFileUpload', 'cgBusy', 'ngRoute', 'ui.grid', 'ui.grid.edit', 'ui.grid.cellNav', 'ui.grid.treeView', 'ui.grid.selection', 'ui.grid.pagination'])
 
     .config(['$routeProvider', function ($routeProvider, $http) {
         $routeProvider.when('/doctor', {
@@ -21,92 +21,57 @@ angular.module('myApp.doctor', ['NewfileDialog', 'datePicker', 'angularModalServ
                 {name: '答案', field: 'question.answer',cellTemplate:'<div class="ui-grid-cell-contents" title="{{row.entity.question.answer}}">{{row.entity.question.answer}}</div>'},
                 {name: '评论内容', field: 'content' },
                 {name: '评论时间', field: 'commentTime'},
-
             ]
         };
         //
-        $scope.beginTime=null;
-        $scope.endTime=null;
-        $scope.parent = {beginTime:'',endTime:'',count:0};
 
-        var loadData=function( beginTime,endTime){
+
+        var loadData=function( ){
             $http.get(SERVER.URL+'/doctor/comment', {
                     params: {
-                        beginTime: beginTime,
-                        endTime: endTime,
-                        doctor: entity._id
+                        beginTime: entity.beginTime,
+                        endTime: entity.endTime,
+                        doctor: entity.doctor._id
                     }
                 }
             ).success(function (result) {
                     $scope.gridOptions2.data = result;
-                    $scope.parent.count = result.length;
                 });
         }
         loadData();
-        $scope.clickSearch = function () {
 
-            if($scope.parent.beginTime == null ||$scope.parent.endTime ==null )
-            {
-                alert('输入完整的时间');
-            }else{
-                loadData($scope.parent.beginTime,$scope.parent.endTime);
-            }
-
-
-        }
     })
-    .controller('CheckAcceptModalCtrl', function ($scope, close, $http,SERVER, entity) {
+    .controller('CheckBeenCommentModalCtrl',function($scope,close,SERVER,$http,entity){
         $scope.gridOptions2 = {
             enableRowSelection: true,
-            showGridFooter: true,
             enableColumnResize: true,
             enableRowHeaderSelection: false,
             multiSelect: false,
             columnDefs: [
-                {name: '问题', field: 'question'},
-                {name: '答案', field: 'answer'},
-                {name: '认领时间', field: 'answerTime'},
-
+                {name: '问题', field: 'question',cellTemplate:'<div class="ui-grid-cell-contents" title="{{row.entity.question.question}}">{{row.entity.question}}</div>'},
+                {name: '答案', field: 'answer',cellTemplate:'<div class="ui-grid-cell-contents" title="{{row.entity.question.answer}}">{{row.entity.answer}}</div>'},
+                {name: '评论内容', field: 'content' },
+                {name: '评论时间', field: 'commentTime'},
             ]
         };
         //
-        $scope.beginTime=null;
-        $scope.endTime=null;
-        $scope.parent = {beginTime:'',endTime:'',count:0};
 
-        var loadData=function( beginTime,endTime){
-            $http.get(SERVER.URL+'/doctor/count', {
+        var loadData=function( ){
+            $http.get(SERVER.URL+'/doctor/beenComment', {
                     params: {
-                        beginTime: beginTime,
-                        endTime: endTime,
-                        doctor: entity._id
+                        beginTime: entity.beginTime,
+                        endTime: entity.endTime,
+                        doctor: entity.doctor._id
                     }
                 }
             ).success(function (result) {
-
-                        $scope.gridOptions2.data = result;
-                        $scope.parent.count = result.length;
-
-
-                    //
+                    $scope.gridOptions2.data = result;
                 });
-
         }
         loadData();
-        $scope.clickSearch = function () {
 
-            if($scope.parent.beginTime == null ||$scope.parent.endTime == null )
-            {
-                alert('输入完整的时间');
-            }else{
-                loadData($scope.parent.beginTime,$scope.parent.endTime);
-            }
-
-
-        }
-        //
-
-    }).controller('CategoryCtrl', function ($scope, close,SERVER, $http, entity) {
+    })
+    .controller('CategoryCtrl', function ($scope, close,SERVER, $http, entity) {
             $scope.gridOptions1 = {
                 enableRowSelection: true,
                 enableRowHeaderSelection: false,
@@ -210,7 +175,6 @@ angular.module('myApp.doctor', ['NewfileDialog', 'datePicker', 'angularModalServ
             }
             $scope.delDoctor = function (entity) {
                 //
-                //
                 $scope.myPromise = $http.delete(SERVER.URL+'/doctors', {params: entity}).success(function (data) {
                     //
                     getTatalPage();
@@ -242,7 +206,7 @@ angular.module('myApp.doctor', ['NewfileDialog', 'datePicker', 'angularModalServ
                     });
                 });
             }
-            $scope.changePortait = function (object) {
+        $scope.changePortait = function (object) {
                 //
                 fileDialog.openFile(function (e) {
                     //
@@ -264,34 +228,30 @@ angular.module('myApp.doctor', ['NewfileDialog', 'datePicker', 'angularModalServ
                 });
                 //
             }
-            $scope.checkAccept = function (object) {
-                //
-                ModalService.showModal({
-                    templateUrl: "doctor/checkAcceptModal.html",
-                    controller: "CheckAcceptModalCtrl",
-                    inputs: {entity: object}
-                }).then(function (modal) {
-                    // The modal object has the element built, if this is a bootstrap modal
-                    // you can call 'modal' to show it, if it's a custom modal just show or hide
-                    // it as you need to.
 
-                    modal.element.modal();
-                    modal.close.then(function (result) {
-                        if (result == "Yes") {
-                            //
-                            update(object);
-                            //
-                        }
-                    });
+        $scope.checkBeenComment = function (object) {
+            //
+            ModalService.showModal({
+                templateUrl: "doctor/checkCommentModal.html",
+                controller: "CheckBeenCommentModalCtrl",
+                inputs: {entity: {doctor:object,endTime:$scope.checkBeenCommentEndDate,beginTime:$scope.checkBeenCommentBeginDate}}
+            }).then(function (modal) {
+                // The modal object has the element built, if this is a bootstrap modal
+                // you can call 'modal' to show it, if it's a custom modal just show or hide
+                // it as you need to.
+                modal.element.modal();
+                modal.close.then(function (result) {
+
                 });
-                //
-            }
+            });
+            //
+        }
         $scope.checkComment = function (object) {
             //
             ModalService.showModal({
                 templateUrl: "doctor/checkCommentModal.html",
                 controller: "CheckCommentModalCtrl",
-                inputs: {entity: object}
+                inputs: {entity: {doctor:object,beginTime:$scope.checkCommentBeginDate,endTime:$scope.checkCommentEndDate}}
             }).then(function (modal) {
                 // The modal object has the element built, if this is a bootstrap modal
                 // you can call 'modal' to show it, if it's a custom modal just show or hide
@@ -318,43 +278,64 @@ angular.module('myApp.doctor', ['NewfileDialog', 'datePicker', 'angularModalServ
                 //
             }
             $scope.gridOptions = {
+
                 paginationPageSizes: [25, 50, 75],
                 paginationPageSize: 25,
                 enableCellEditOnFocus: true,
                 showColumnFooter: true,
+                enableFiltering: true,
                 useExternalPagination: true,
                 columnDefs: [
                     {
                         name: '姓名',
                         field: 'name',
-                        footerCellTemplate: '<div class="ui-grid-cell-contents" ng-click="" ><a ng-click=" $event.stopPropagation();grid.appScope.add()">增加</a></div>'
+                        enableFiltering: false
+                        //footerCellTemplate: '<div class="ui-grid-cell-contents" ng-click="" ><a ng-click=" $event.stopPropagation();grid.appScope.add()">增加</a></div>'
                     },
                     {
                         name: '真实姓名',
                         field: 'trueName',
-                        footerCellTemplate: '<div class="ui-grid-cell-contents" ng-click="" ><a ng-click=" $event.stopPropagation();grid.appScope.add()">增加</a></div>'
+                        enableFiltering: false
+                        //footerCellTemplate: '<div class="ui-grid-cell-contents" ng-click="" ><a ng-click=" $event.stopPropagation();grid.appScope.add()">增加</a></div>'
                     },
-                    {name: '密码', field: 'password'},
-                    {name: '手机', field: 'phone'},
+                    {name: '密码', field: 'password',enableFiltering: false},
+                    {name: '手机', field: 'phone', enableFiltering: false},
                     {
                         name: '头像',
+                        enableFiltering: false,
                         cellTemplate: '<a  ng-if="row.entity.$$treeLevel != 0" class="btn" ng-click="$event.stopPropagation();grid.appScope.changePortait(row.entity)"><img width="30" height="30" ng-src="http://113.31.89.204:3030/images/{{row.entity.image}}" ></a>'
                     },
                     {
                         name: '兴趣',
+                        enableFiltering: false,
                         cellTemplate: '<a ng-if="row.entity.$$treeLevel != 0" class="btn" ng-click="$event.stopPropagation();grid.appScope.editCategory(row.entity)">编辑</a>'
                     },
                     {
                         name: '删除',
+                        enableFiltering: false,
                         cellTemplate: '<a ng-if="row.entity.$$treeLevel != 0" class="btn" ng-click="$event.stopPropagation();grid.appScope.delDoctor(row.entity)">删除</a>'
                     },
                     {
+                       width:'20%',
                         name: '认领总数',
-                        cellTemplate:'<div class="ui-grid-cell-contents" ng-click="" ><a ng-click=" $event.stopPropagation();grid.appScope.checkAccept(row.entity)">{{row.entity.acceptCount}}</a></div>'
+                        //headerCellTemplate:'<div class="ui-grid-cell-contents" ng-click="" ><a ng-click=" $event.stopPropagation();grid.appScope.checkAccept()">认领总数</a></div>',
+                        field:'acceptCount',
+                        filterHeaderTemplate: '<div>起始时间:<input  ui-date-format="yy-mm-dd" ui-date="grid.appScope.dateOptions" ng-model="grid.appScope.checkAcceptBeginDate" style="width:70%"></div><div> 结束时间:<input  ui-date="grid.appScope.dateOptions" ui-date-format="yy-mm-dd"  ng-model="grid.appScope.checkAcceptEndDate" style="width:70%"></div>',
+                        //cellTemplate:'<div class="ui-grid-cell-contents" ng-click="" ><a ng-click=" $event.stopPropagation();grid.appScope.checkAccept(row.entity)">{{row.entity.acceptCount}}</a></div>'
                     },
                     {
                         name: '评论总数',
+                        width:'20%',
+                        filterHeaderTemplate: '<div>起始时间:<input ui-date-format="yy-mm-dd" ui-date="grid.appScope.dateOptions1" style="width:70%" ng-model="grid.appScope.checkCommentBeginDate"></div><div> 结束时间:<input ui-date="grid.appScope.dateOptions1" style="width:70%" ng-model="grid.appScope.checkCommentEndDate"></div>',
+
                         cellTemplate:'<div class="ui-grid-cell-contents" ng-click="" ><a ng-click=" $event.stopPropagation();grid.appScope.checkComment(row.entity)">{{row.entity.commentCount}}</a></div>'
+                    },
+                    {
+                        name: '被评论总数',
+                        width:'20%',
+                        filterHeaderTemplate: '<div>起始时间:<input ui-date-format="yy-mm-dd" ui-date="grid.appScope.dateOptions1" style="width:70%" ng-model="grid.appScope.checkBeenCommentBeginDate"></div><div> 结束时间:<input ui-date="grid.appScope.dateOptions1" style="width:70%" ng-model="grid.appScope.checkBeenCommentEndDate"></div>',
+
+                        cellTemplate:'<div class="ui-grid-cell-contents" ng-click="" ><a ng-click=" $event.stopPropagation();grid.appScope.checkBeenComment(row.entity)">{{row.entity.beenCommentCount}}</a></div>'
 
                     }
                 ],
@@ -375,9 +356,43 @@ angular.module('myApp.doctor', ['NewfileDialog', 'datePicker', 'angularModalServ
                     });
                 }
             }
+        $scope.checkAcceptBeginDate="2015-01-01";
+        $scope.checkAcceptEndDate="2015-12-30";
+        $scope.checkCommentBeginDate="2015-01-01";
+        $scope.checkCommentEndDate="2015-12-30";
+        $scope.checkBeenCommentBeginDate="2015-01-01";
+        $scope.checkBeenCommentEndDate="2015-12-30";
+        String.prototype.format = function() {
+            var newStr = this, i = 0;
+            while (/%s/.test(newStr))
+                newStr = newStr.replace("%s", arguments[i++])
+
+            return newStr;
+        }
+        $scope.dateOptions =
+            {
+                changeYear: true,
+                onSelect: function(dateText) {
+
+                    getPage()
+
+                }
+            };
+        $scope.dateOptions1 =
+        {
+            changeYear: true,
+            onSelect: function(dateText) {
+                getPage();
+
+            }
+        };
+
+
             var getTatalPage = function () {
-                $scope.myPromise = $http.get(SERVER.URL+'/doctors/count').success(function (data) {
+                $scope.myPromise = $http.get(SERVER.URL+'/doctors/count'
+                ).success(function (data) {
                     $scope.gridOptions.totalItems = data;
+                        getPage();
                 }).error(function (data) {
 
                 });
@@ -389,7 +404,13 @@ angular.module('myApp.doctor', ['NewfileDialog', 'datePicker', 'angularModalServ
                     params: {
                         pageNo: paginationOptions.pageNumber,
                         pageNumber: paginationOptions.pageSize,
-                        tag: $scope.selectTag
+                        beginAnswerTime:$scope.checkAcceptBeginDate,
+                        endAnswerTime:$scope.checkAcceptEndDate,
+                        beginCommentTime:$scope.checkCommentBeginDate,
+                        endCommentTime:$scope.checkCommentEndDate,
+                        beginBeenCommentTime:$scope.checkBeenCommentBeginDate,
+                        endBeenCommentTime:$scope.checkBeenCommentEndDate
+
                     }
                 }).success(function (data) {
 
@@ -401,5 +422,5 @@ angular.module('myApp.doctor', ['NewfileDialog', 'datePicker', 'angularModalServ
                 });
             };
             getTatalPage();
-            getPage();
+           // getPage();
         });

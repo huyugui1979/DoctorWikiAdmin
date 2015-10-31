@@ -8,7 +8,8 @@
     "angular-bootstrap": "~0.10.0",
     "angular-chart.js": "~0.8.4",
     "angular-datepicker": "~1.0.17",
-    "ng.ckeditor": "*"
+    "ng.ckeditor": "*",
+    "angular-ui-date": "~0.0.8"
   },
   "devDependencies": {}
 }
