@@ -296,6 +296,53 @@ angular.module('myApp.question', ['myApp', 'NewfileDialog', 'cgBusy', 'angularMo
 
             //
         };
+        $scope.compare = function(value){
+            fileDialog.openFile(function (e) {
+                //
+                var files = e.target.files;
+                for(var i=0;i<files.length;i++) {
+                    var reader = new FileReader();
+                    // var name = files[0].name;
+                    reader.onload = function (e) {
+
+                        var wb = XLSX.read(e.target.result, {type: 'binary'});
+                        var result = {};
+                        var sheetNames = [];
+                        wb.SheetNames.forEach(
+                            function (sheetName) {
+                                var roa = XLSX.utils.sheet_to_row_object_array(wb.Sheets[sheetName]);
+                                if (roa.length > 0) {
+                                    result[sheetName] = roa;
+                                    sheetNames.push(sheetName);
+                                }
+                            });
+                        sheetNames.forEach(function (element, i, r) {
+                            result[element].forEach(function (e3, i3, r3) {
+                                //
+                                //
+                            });
+
+                            $scope.myPromise = $http.post(SERVER.URL + "/questions/compare", result[element]).success(function (data) {
+                                //
+                                //getTatalPage();
+                                //getPage();
+                                //
+                                console.log("succeed");
+                            }).error(function (data) {
+                                //
+                                console.log("error");
+                                //
+                            }).finally(function () {
+
+                            });
+                        })
+
+                    }
+                    reader.readAsBinaryString(files[i]);
+                }
+                //
+            },true);
+        }
         //导入数据
         $scope.showMe = function (value) {
             //
@@ -392,10 +439,10 @@ angular.module('myApp.question', ['myApp', 'NewfileDialog', 'cgBusy', 'angularMo
                     width: '8%'
                 },
                 {name: '类别', field: 'category'},
-                //{
-                //    name: '导入数据',
-                //    cellTemplate: '<a ng-if="row.entity.$$treeLevel != 0" class="btn" ng-click="$event.stopPropagation();grid.appScope.showMe(row.entity)">导入数据</a>'
-                //},
+                {
+                    name: '对比数据',
+                    cellTemplate: '<a ng-if="row.entity.$$treeLevel != 0" class="btn" ng-click="$event.stopPropagation();grid.appScope.compare()">导入数据</a>'
+                },
                 {
                     name: '己认领', aggregationType: uiGridConstants.aggregationTypes.sum,
                     field: 'acceptCount'
