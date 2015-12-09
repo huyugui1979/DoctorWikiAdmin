@@ -1,14 +1,21 @@
-<div class="modal fade">
-    <div class="modal-dialog">
+<div class="modal fade" >
+    <div class="modal-dialog" >
+        <div style="position:absolute;width:200px;height:200px;left:50%;top:50%;margin-left:-400px;margin-top:-120px" cg-busy="myPromise"></div>
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" ng-click="closeModal('Cancel')" data-dismiss="modal" aria-hidden="true">&times;</button>
                 <h4 class="modal-title">查询</h4>
             </div>
             <div class="modal-body">
+                <div class="list" ng-repeat="question in questions">
 
-                <div id="grid1" ui-grid="gridOptions2"  ui-grid-tree-view   ui-grid-selection ui-grid-resize-columns class="grid"></div>
-;.
+                <div>问题:{{question.question}}</div>
+                    <div data-ng-bind-html="question.answer"></div>
+                <div>评论:{{question.content}}</div>
+                 <div>时间:{{question.commentTime}}</div>
+                    <div><button style="width: 100%;background-color: red" ng-click="deleteComment($index)">删除</button></div>
+                </div>
+
             </div>
             <div class="modal-footer">
                 <button type="button" ng-click="closeModal('No')" class="btn btn-default" data-dismiss="modal">No</button>

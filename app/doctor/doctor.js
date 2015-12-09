@@ -10,62 +10,76 @@ angular.module('myApp.doctor', ['NewfileDialog', 'datePicker', 'angularModalServ
             controller: 'DoctorCtrl'
         });
     }])
-    .controller('CheckCommentModalCtrl',function($scope,close,SERVER,$http,entity){
-        $scope.gridOptions2 = {
-            enableRowSelection: true,
-            enableColumnResize: true,
-            enableRowHeaderSelection: false,
-            multiSelect: false,
-            columnDefs: [
-                {name: '问题', field: 'question.question',cellTemplate:'<div class="ui-grid-cell-contents" title="{{row.entity.question.question}}">{{row.entity.question.question}}</div>'},
-                {name: '答案', field: 'question.answer',cellTemplate:'<div class="ui-grid-cell-contents" title="{{row.entity.question.answer}}">{{row.entity.question.answer}}</div>'},
-                {name: '评论内容', field: 'content' },
-                {name: '评论时间', field: 'commentTime'},
-            ]
-        };
+    .controller('CheckCommentModalCtrl',function($scope,close,SERVER,$http,entity,$sce){
+
         //
 
-
-        var loadData=function( ){
-            $http.get(SERVER.URL+'/doctor/comment', {
+        $scope.deleteComment = function(index){
+            $http.delete(SERVER.URL+'/doctor/comment', {
                     params: {
-                        beginTime: entity.beginTime,
-                        endTime: entity.endTime,
-                        doctor: entity.doctor._id
+                        commentId: $scope.questions[index].commentId,
+                        questionId:$scope.questions[index].questionId,
+                        pageNo:pageNo
                     }
                 }
             ).success(function (result) {
-                    $scope.gridOptions2.data = result;
+                    $scope.questions.splice(index,1);
+                });
+        }
+
+        var loadData=function( ){
+            $scope.myPromise =   $http.get(SERVER.URL+'/doctor/comment', {
+                    params: {
+                        beginTime: entity.beginTime,
+                        endTime: entity.endTime,
+                        doctor: entity.doctor._id,
+
+                    }
+                }
+            ).success(function (result) {
+
+                    result.forEach(function(e,i,a){
+                        e.answer = $sce.trustAsHtml(e.answer);
+
+                    });
+                    $scope.questions = result;
                 });
         }
         loadData();
 
     })
-    .controller('CheckBeenCommentModalCtrl',function($scope,close,SERVER,$http,entity){
-        $scope.gridOptions2 = {
-            enableRowSelection: true,
-            enableColumnResize: true,
-            enableRowHeaderSelection: false,
-            multiSelect: false,
-            columnDefs: [
-                {name: '问题', field: 'question',cellTemplate:'<div class="ui-grid-cell-contents" title="{{row.entity.question.question}}">{{row.entity.question}}</div>'},
-                {name: '答案', field: 'answer',cellTemplate:'<div class="ui-grid-cell-contents" title="{{row.entity.question.answer}}">{{row.entity.answer}}</div>'},
-                {name: '评论内容', field: 'content' },
-                {name: '评论时间', field: 'commentTime'},
-            ]
-        };
-        //
+    .controller('CheckBeenCommentModalCtrl',function($scope,close,SERVER,$http,entity,$sce){
 
-        var loadData=function( ){
-            $http.get(SERVER.URL+'/doctor/beenComment', {
+
+        $scope.deleteComment = function(index){
+            $http.delete(SERVER.URL+'/doctor/comment', {
                     params: {
-                        beginTime: entity.beginTime,
-                        endTime: entity.endTime,
-                        doctor: entity.doctor._id
+                        commentId: $scope.questions[index].commentId,
+                        questionId:$scope.questions[index].questionId
+
                     }
                 }
             ).success(function (result) {
-                    $scope.gridOptions2.data = result;
+                    $scope.questions.splice(index,1);
+                });
+
+        }
+        var loadData=function( ){
+            $scope.myPromise = $http.get(SERVER.URL+'/doctor/beenComment', {
+                    params: {
+                        beginTime: entity.beginTime,
+                        endTime: entity.endTime,
+                        doctor: entity.doctor._id,
+
+                    }
+                }
+            ).success(function (result) {
+
+                    result.forEach(function(e,i,a){
+                        e.answer = $sce.trustAsHtml(e.answer);
+
+                    });
+                    $scope.questions = result;
                 });
         }
         loadData();
@@ -234,14 +248,16 @@ angular.module('myApp.doctor', ['NewfileDialog', 'datePicker', 'angularModalServ
             ModalService.showModal({
                 templateUrl: "doctor/checkCommentModal.html",
                 controller: "CheckBeenCommentModalCtrl",
-                inputs: {entity: {doctor:object,endTime:$scope.checkBeenCommentEndDate,beginTime:$scope.checkBeenCommentBeginDate}}
+                inputs: {entity: {total:object.beenCommentCount,doctor:object,endTime:$scope.checkBeenCommentEndDate,beginTime:$scope.checkBeenCommentBeginDate}}
             }).then(function (modal) {
                 // The modal object has the element built, if this is a bootstrap modal
                 // you can call 'modal' to show it, if it's a custom modal just show or hide
                 // it as you need to.
                 modal.element.modal();
                 modal.close.then(function (result) {
-
+                    //
+                    getTatalPage();
+                    //
                 });
             });
             //
@@ -251,14 +267,14 @@ angular.module('myApp.doctor', ['NewfileDialog', 'datePicker', 'angularModalServ
             ModalService.showModal({
                 templateUrl: "doctor/checkCommentModal.html",
                 controller: "CheckCommentModalCtrl",
-                inputs: {entity: {doctor:object,beginTime:$scope.checkCommentBeginDate,endTime:$scope.checkCommentEndDate}}
+                inputs: {entity: {total:object.commentCount,doctor:object,beginTime:$scope.checkCommentBeginDate,endTime:$scope.checkCommentEndDate}}
             }).then(function (modal) {
                 // The modal object has the element built, if this is a bootstrap modal
                 // you can call 'modal' to show it, if it's a custom modal just show or hide
                 // it as you need to.
                 modal.element.modal();
                 modal.close.then(function (result) {
-
+                    getTatalPage();
                 });
             });
             //
