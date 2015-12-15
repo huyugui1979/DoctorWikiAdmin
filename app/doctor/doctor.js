@@ -10,6 +10,11 @@ angular.module('myApp.doctor', ['NewfileDialog', 'datePicker', 'angularModalServ
             controller: 'DoctorCtrl'
         });
     }])
+    .controller('CheckQuestionModalCtrl',function($scope,close,SERVER,$http,entity,$sce){
+        //
+
+        //
+    })
     .controller('CheckCommentModalCtrl',function($scope,close,SERVER,$http,entity,$sce){
 
         //
@@ -297,7 +302,6 @@ angular.module('myApp.doctor', ['NewfileDialog', 'datePicker', 'angularModalServ
 
                 paginationPageSizes: [25, 50, 75],
                 paginationPageSize: 25,
-                enableCellEditOnFocus: true,
                 showColumnFooter: true,
                 enableFiltering: true,
                 useExternalPagination: true,

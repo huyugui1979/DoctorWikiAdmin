@@ -1,0 +1,24 @@
+<div class="modal fade" >
+    <div class="modal-dialog" >
+        <div  cg-busy="myPromise"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" ng-click="closeModal('Cancel')" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">查询</h4>
+            </div>
+            <div class="modal-body">
+                <div class="list" ng-repeat="question in questions">
+
+                    <div>问题:{{question.question}}</div>
+                    <div data-ng-bind-html="question.answer"></div>
+                    <div><button style="width: 100%;background-color: red" ng-click="deleteComment($index)">删除</button></div>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" ng-click="closeModal('No')" class="btn btn-default" data-dismiss="modal">No</button>
+                <button type="button" ng-click="closeModal('Yes')" class="btn btn-primary" data-dismiss="modal">Yes</button>
+            </div>
+        </div>
+    </div>
+</div>
