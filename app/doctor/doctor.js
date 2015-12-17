@@ -331,6 +331,7 @@ angular.module('myApp.doctor', ['NewfileDialog', 'datePicker', 'angularModalServ
                         cellTemplate: '<a ng-if="row.entity.$$treeLevel != 0" class="btn" ng-click="$event.stopPropagation();grid.appScope.editCategory(row.entity)">编辑</a>'
                     },
                     {
+
                         name: '删除',
                         enableFiltering: false,
                         cellTemplate: '<a ng-if="row.entity.$$treeLevel != 0" class="btn" ng-click="$event.stopPropagation();grid.appScope.delDoctor(row.entity)">删除</a>'
