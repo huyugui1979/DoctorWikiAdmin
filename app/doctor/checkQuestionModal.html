@@ -11,7 +11,7 @@
 
                     <div>问题:{{question.question}}</div>
                     <div data-ng-bind-html="question.answer"></div>
-                    <div><button style="width: 100%;background-color: red" ng-click="deleteComment($index)">删除</button></div>
+                    <div ng-click="deleteComment($index)"><button style="width: 100%;background-color: red">删除</button></div>
                 </div>
 
             </div>
