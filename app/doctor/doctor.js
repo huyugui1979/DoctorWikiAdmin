@@ -20,11 +20,11 @@ angular.module('myApp.doctor', ['NewfileDialog', 'datePicker', 'angularModalServ
         //
 
         $scope.deleteComment = function(index){
+
             $http.delete(SERVER.URL+'/doctor/comment', {
                     params: {
                         commentId: $scope.questions[index].commentId,
-                        questionId:$scope.questions[index].questionId,
-                        pageNo:pageNo
+                        questionId:$scope.questions[index].questionId
                     }
                 }
             ).success(function (result) {
