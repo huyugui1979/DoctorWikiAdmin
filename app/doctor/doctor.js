@@ -323,7 +323,7 @@ angular.module('myApp.doctor', ['NewfileDialog', 'datePicker', 'angularModalServ
                     {
                         name: '头像',
                         enableFiltering: false,
-                        cellTemplate: '<a  ng-if="row.entity.$$treeLevel != 0" class="btn" ng-click="$event.stopPropagation();grid.appScope.changePortait(row.entity)"><img width="30" height="30" ng-src="http://113.31.89.204:3030/images/{{row.entity.image}}" ></a>'
+                        cellTemplate: '<a  ng-if="row.entity.$$treeLevel != 0" class="btn" ng-click="$event.stopPropagation();grid.appScope.changePortait(row.entity)"><img width="30" height="30" ng-src="http://113.31.89.205:3030/images/{{row.entity.image}}" ></a>'
                     },
                     {
                         name: '兴趣',
