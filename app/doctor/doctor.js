@@ -12,7 +12,35 @@ angular.module('myApp.doctor', ['NewfileDialog', 'datePicker', 'angularModalServ
     }])
     .controller('CheckQuestionModalCtrl',function($scope,close,SERVER,$http,entity,$sce){
         //
+        $scope.deleteQuestion = function(index){
 
+            $http.delete(SERVER.URL+'/doctor/question', {
+                    params: {
+                        question:$scope.questions[index]._id
+                    }
+                }
+            ).success(function (result) {
+                    $scope.questions.splice(index,1);
+                });
+        }
+        var loadData=function( ){
+            $scope.myPromise =   $http.get(SERVER.URL+'/doctor/question', {
+                    params: {
+                        beginTime: entity.beginTime,
+                        endTime: entity.endTime,
+                        doctor: entity.doctor
+                    }
+                }
+            ).success(function (result) {
+
+                    result.forEach(function(e,i,a){
+                        e.answer = $sce.trustAsHtml(e.answer);
+                    });
+                    $scope.questions = result;
+                });
+        }
+
+        loadData();
         //
     })
     .controller('CheckCommentModalCtrl',function($scope,close,SERVER,$http,entity,$sce){
@@ -247,7 +275,23 @@ angular.module('myApp.doctor', ['NewfileDialog', 'datePicker', 'angularModalServ
                 });
                 //
             }
-
+        $scope.checkQuestion = function(object){
+            ModalService.showModal({
+                templateUrl: "doctor/checkQuestionModal.html",
+                controller: "CheckQuestionModalCtrl",
+                inputs: {entity: {doctor:object._id,endTime:$scope.checkAcceptEndDate,beginTime:$scope.checkAcceptBeginDate}}
+            }).then(function (modal) {
+                // The modal object has the element built, if this is a bootstrap modal
+                // you can call 'modal' to show it, if it's a custom modal just show or hide
+                // it as you need to.
+                modal.element.modal();
+                modal.close.then(function (result) {
+                    //
+                    getTatalPage();
+                    //
+                });
+            });
+        }
         $scope.checkBeenComment = function (object) {
             //
             ModalService.showModal({
@@ -339,8 +383,9 @@ angular.module('myApp.doctor', ['NewfileDialog', 'datePicker', 'angularModalServ
                     {
                        width:'20%',
                         name: '认领总数',
-                        //headerCellTemplate:'<div class="ui-grid-cell-contents" ng-click="" ><a ng-click=" $event.stopPropagation();grid.appScope.checkAccept()">认领总数</a></div>',
-                        field:'acceptCount',
+                        cellTemplate:'<div class="ui-grid-cell-contents" ng-click="" ><a ng-click=" $event.stopPropagation();grid.appScope.checkQuestion(row.entity)">{{row.entity.acceptCount}}</a></div>',
+
+
                         filterHeaderTemplate: '<div>起始时间:<input  ui-date-format="yy-mm-dd" ui-date="grid.appScope.dateOptions" ng-model="grid.appScope.checkAcceptBeginDate" style="width:70%"></div><div> 结束时间:<input  ui-date="grid.appScope.dateOptions" ui-date-format="yy-mm-dd"  ng-model="grid.appScope.checkAcceptEndDate" style="width:70%"></div>',
                         //cellTemplate:'<div class="ui-grid-cell-contents" ng-click="" ><a ng-click=" $event.stopPropagation();grid.appScope.checkAccept(row.entity)">{{row.entity.acceptCount}}</a></div>'
                     },
