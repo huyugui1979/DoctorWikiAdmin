@@ -31,6 +31,7 @@ angular.module('myApp.doctor', ['NewfileDialog', 'datePicker', 'angularModalServ
                         doctor: entity.doctor
                     }
                 }
+
             ).success(function (result) {
 
                     result.forEach(function(e,i,a){
